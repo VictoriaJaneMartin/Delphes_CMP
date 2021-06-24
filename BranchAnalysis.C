@@ -38,11 +38,25 @@ void BranchAnalysis(const char *inputFile)
   TH1 *PartID = new TH1F("PID", "PID", 100, 1000, 4000);
 
   // Chi Histograms
-  TH1 *chiStatus= new TH1F("chi_Status", "chi_Status", 100, 0, 100);
-  TH1 *chiPT = new TH1F("chi_PT", "chi_PT", 100, 0, 1000000);
-  TH1 *chiE = new TH1F("chi_E", "chi_E", 100, 0, 1000000);
-  TH1 *chiEta = new TH1F("chi_Eta", "chi_Eta", 100, 0, 7);
-  TH1 *chiPhi = new TH1F("chi_phi", "chi_phi", 100, 0, 7);
+  TH1 *chiStatus= new TH1F("chi_Status", "chi_Status", 100, 0, 10);
+  TH1 *chiPT = new TH1F("chi_PT", "chi_PT", 100, 0, 1000);
+  TH1 *chiE = new TH1F("chi_E", "chi_E", 100, 0, 2000);
+  TH1 *chiEta = new TH1F("chi_Eta", "chi_Eta", 100, -7, 7);
+  TH1 *chiPhi = new TH1F("chi_phi", "chi_phi", 100, -3.5, 3.5);
+
+  // Scalar Histograms
+  TH1 *scalarStatus= new TH1F("scalar_Status", "scalar_Status", 100, 0, 10);
+  TH1 *scalarPT = new TH1F("scalar_PT", "scalar_PT", 100, 0, 1000);
+  TH1 *scalarE = new TH1F("scalar_E", "scalar_E", 100, 0, 2000);
+  TH1 *scalarEta = new TH1F("scalar_Eta", "scalar_Eta", 100, -7, 7);
+  TH1 *scalarPhi = new TH1F("scalar_phi", "scalar_phi", 100, -3.5, 3.5);
+
+  // Psi Histograms
+  TH1 *psiStatus= new TH1F("psi_Status", "psi_Status", 100, 0, 10);
+  TH1 *psiPT = new TH1F("psi_PT", "psi_PT", 100, 0, 1000);
+  TH1 *psiE = new TH1F("psi_E", "psi_E", 100, 0, 2000);
+  TH1 *psiEta = new TH1F("psi_Eta", "psi_Eta", 100, -7, 7);
+  TH1 *psiPhi = new TH1F("psi_phi", "psi_phi", 100, -3.5, 3.5);
 
   // Add all histograms to list
   l->Add(histJetPT);
@@ -54,6 +68,18 @@ void BranchAnalysis(const char *inputFile)
   l->Add(chiPT);
   l->Add(chiEta);
   l->Add(chiPhi);
+
+  l->Add(scalarStatus);
+  l->Add(scalarE);
+  l->Add(scalarPT);
+  l->Add(scalarEta);
+  l->Add(scalarPhi);
+
+  l->Add(psiStatus);
+  l->Add(psiE);
+  l->Add(psiPT);
+  l->Add(psiEta);
+  l->Add(psiPhi);
 
   // Loop over all events
   for(Int_t entry = 0; entry < numberOfEntries; ++entry)
@@ -68,50 +94,43 @@ void BranchAnalysis(const char *inputFile)
 
       if (branchParticle->GetEntries() > 0)
       {
-          GenParticle *particle =  (GenParticle*) branchParticle->At(0);
-          PartID->Fill(particle->PID);
-          cout << "PID: "<<particle->PID << endl;
-          if (1000024 == abs(particle->PID))
+          for( unsigned int a = 0; a < sizeof(branchParticle); a = a + 1 )
           {
-            chiStatus->Fill(particle->Status);
-            chiE->Fill(particle->E);
-            chiPT->Fill(particle->PT);
-            chiEta->Fill(particle->Eta);
-            chiPhi->Fill(particle->Phi);
+            GenParticle *particle =  (GenParticle*) branchParticle->At(a);
+            PartID->Fill(particle->PID);
+            cout << "PID: "<<particle->PID << endl;
+            if (200001 == abs(particle->PID))
+            {
+              chiStatus->Fill(particle->Status);
+              chiE->Fill(particle->E);
+              chiPT->Fill(particle->PT);
+              chiEta->Fill(particle->Eta);
+              chiPhi->Fill(particle->Phi);
+            }
+            if (5000001 == abs(particle->PID))
+            {
+              scalarStatus->Fill(particle->Status);
+              scalarE->Fill(particle->E);
+              scalarPT->Fill(particle->PT);
+              scalarEta->Fill(particle->Eta);
+              scalarPhi->Fill(particle->Phi);
+            }
+            if (200000 == abs(particle->PID))
+            {
+              psiStatus->Fill(particle->Status);
+              psiE->Fill(particle->E);
+              psiPT->Fill(particle->PT);
+              psiEta->Fill(particle->Eta);
+              psiPhi->Fill(particle->Phi);
+            }
           }
         }
 
-
-    // If event contains at least 1 jet
-    if(branchJet->GetEntries() > 0)
-    {
-      // Take first jet
-      Jet *jet = (Jet*) branchJet->At(0);
-
-      // Plot jet transverse momentum
-      histJetPT->Fill(jet->PT);
-
-      // Print jet transverse momentum
-      //cout << "Jet pt: "<<jet->PT << endl;
-    }
-
-    Electron *elec1, *elec2;
-
-    // If event contains at least 2 electrons
-    if(branchElectron->GetEntries() > 1)
-    {
-      // Take first two electrons
-      elec1 = (Electron *) branchElectron->At(0);
-      elec2 = (Electron *) branchElectron->At(1);
-
-      // Plot their invariant mass
-      histMass->Fill(((elec1->P4()) + (elec2->P4())).M());
-    }
   }
 
 
-  TFile *f = new TFile("histlist.root","RECREATE");
-  l->Write("histlist", TObject::kSingleKey);
+  TFile *f = new TFile("ntuple_delphes.root","RECREATE");
+  l->Write("ntuple_delphes", TObject::kSingleKey);
   f->ls();
 
 }
