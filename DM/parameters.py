@@ -404,7 +404,7 @@ WH = Parameter(name = 'WH',
 Wphi1 = Parameter(name = 'Wphi1',
                   nature = 'external',
                   type = 'real',
-                  value = 20.85,
+                  value = 1,
                   texname = '\\text{Wphi1}',
                   lhablock = 'DECAY',
                   lhacode = [ 5000001 ])
