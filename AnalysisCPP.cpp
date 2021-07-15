@@ -132,7 +132,7 @@ void AnalysisCPP(const char *inputFile)
 
 
   // Book histograms
-  TFile *f = new TFile("tcl.root","RECREATE");
+  TFile *f = new TFile("ntuple_delphes.root","RECREATE");
   auto T = new TTree("analysisTree","test");
   auto T_Delta = new TTree("DeltaR_Analysis","test");
 
