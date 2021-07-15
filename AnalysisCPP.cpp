@@ -15,31 +15,29 @@ R__LOAD_LIBRARY(libDelphes)
 #endif
 
 //------------------------------------------------------------------------------
-double Delta_R_Function(TLorentzVector c1,TLorentzVector c2,TLorentzVector m1,TLorentzVector m2 )
+double Delta_R_Function(vector<float> p1_pt ,vector<float> p1_Eta ,vector<float> p1_Phi ,vector<float> p1_E, vector<float> p2_pt ,vector<float> p2_Eta ,vector<float> p2_Phi ,vector<float> p2_E  )
 {
+  TLorentzVector c1;
+  TLorentzVector c2;
+  TLorentzVector m1;
+  TLorentzVector m2;
+  c1.SetPtEtaPhiE(p1_pt[0],p1_Eta[0],p1_Phi[0],p1_E[0]);
+  c2.SetPtEtaPhiE(p1_pt[1],p1_Eta[1],p1_Phi[1],p1_E[1]);
+  m1.SetPtEtaPhiE(p2_pt[0],p2_Eta[0],p2_Phi[0],p2_E[0]);
+  m2.SetPtEtaPhiE(p2_pt[1],p2_Eta[1],p2_Phi[1],p2_E[1]);
   float DR_pr1 = c1.DeltaR(m1);
   float DR_pr2 = c1.DeltaR(m2);
   float DR_pr3 = c2.DeltaR(m1);
   float DR_pr4 = c2.DeltaR(m2);
   if (DR_pr1 + DR_pr4 <  DR_pr2 + DR_pr3)
   {
-    if (DR_pr1 < DR_pr4){
-      return DR_pr1;
-    }
-    else
-    {
-      return DR_pr4;
-    }
+    if (DR_pr1 < DR_pr4){ return DR_pr1;  }
+    else  { return DR_pr4;  }
   }
   else
   {
-    if (DR_pr2 < DR_pr3){
-      return DR_pr2;
-    }
-    else
-    {
-      return DR_pr3;
-    }
+    if (DR_pr2 < DR_pr3){  return DR_pr2;    }
+    else   {  return DR_pr3;  }
   }
 }
 
@@ -61,9 +59,6 @@ void AnalysisCPP(const char *inputFile)
   TClonesArray *branchEvent = treeReader->UseBranch("Event");
   TClonesArray *branchParticle = treeReader->UseBranch("Particle");
   TClonesArray *branchMuon = treeReader->UseBranch("Muon");
-
-
-
 
   // Analysis Tree Variables
   vector<int> chi_status_int;
@@ -90,6 +85,7 @@ void AnalysisCPP(const char *inputFile)
 
   vector<int> elec_N_int;
   vector<int> elec_status_int;
+  vector<float> elec_E_float;
   vector<float> elec_pt_float;
   vector<float> elec_Eta_float;
   vector<float> elec_Phi_float;
@@ -103,6 +99,7 @@ void AnalysisCPP(const char *inputFile)
 
   vector<int> tau_status_int;
   vector<int> tau_N_int;
+  vector<float> tau_E_float;
   vector<float> tau_pt_float;
   vector<float> tau_Eta_float;
   vector<float> tau_Phi_float;
@@ -120,14 +117,24 @@ void AnalysisCPP(const char *inputFile)
   vector<float> NN3_Phi_float;
 
   // Delta R Analysis Variable
-  vector<float> Muon_DeltaR;
+  vector<float> chi_Muon_DeltaR;
+  vector<float> chi_elec_DeltaR;
+  vector<float> chi_tau_DeltaR;
+
+  vector<float> scalar_Muon_DeltaR;
+  vector<float> scalar_elec_DeltaR;
+  vector<float> scalar_tau_DeltaR;
+
+  vector<float> Psi_Muon_DeltaR;
+  vector<float> Psi_elec_DeltaR;
+  vector<float> Psi_tau_DeltaR;
 
 
 
   // Book histograms
   TFile *f = new TFile("tcl.root","RECREATE");
   auto T = new TTree("analysisTree","test");
-  auto T_Delta = new TTree("Delta_Analysis","test");
+  auto T_Delta = new TTree("DeltaR_Analysis","test");
 
   // Analysis Tree Branches
   T->Branch("chi_status",&chi_status_int);
@@ -185,7 +192,18 @@ void AnalysisCPP(const char *inputFile)
 
   // Delta R Analysis Branches
 
-  T_Delta->Branch("Muon_Delta_R", &Muon_DeltaR);
+  T_Delta->Branch("Chi_Muon_Delta_R", &chi_Muon_DeltaR);
+  T_Delta->Branch("Chi_elec_Delta_R", &chi_elec_DeltaR);
+  T_Delta->Branch("Chi_tau_Delta_R", &chi_tau_DeltaR);
+
+  T_Delta->Branch("scalar_Muon_Delta_R", &scalar_Muon_DeltaR);
+  T_Delta->Branch("scalar_elec_Delta_R", &scalar_elec_DeltaR);
+  T_Delta->Branch("scalar_tau_Delta_R", &scalar_tau_DeltaR);
+
+  T_Delta->Branch("Psi_Muon_Delta_R", &Psi_Muon_DeltaR);
+  T_Delta->Branch("Psi_elec_Delta_R", &Psi_elec_DeltaR);
+  T_Delta->Branch("Psi_tau_Delta_R", &Psi_tau_DeltaR);
+
 
   // Loop over all events
   for(Int_t entry = 0; entry < numberOfEntries; ++entry)
@@ -198,14 +216,10 @@ void AnalysisCPP(const char *inputFile)
           for( unsigned int a = 0; a < branchParticle->GetEntries(); a = a + 1 )
           {
             GenParticle *particle =  (GenParticle*) branchParticle->At(a);
-            //PartID->Fill(particle->PID);
-            //cout << "PID: "<<particle->PID << endl;
-            //if (3==(particle->Status)) // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookGenParticleCandidate
-            //{
             if (200001 == abs(particle->PID))
             {
               chi_status_int.push_back(particle->Status);
-              if (3 == (particle->Status))
+              if (3 == (particle->Status)) // https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookGenParticleCandidate
               {
               chi_pt_float.push_back(particle->PT);
               chi_E_float.push_back(particle->E);
@@ -249,6 +263,7 @@ void AnalysisCPP(const char *inputFile)
               tau_pt_float.push_back(particle->PT);
               tau_Eta_float.push_back(particle->Eta);
               tau_Phi_float.push_back(particle->Phi);
+              tau_E_float.push_back(particle->E);
             }
             if (11 == abs(particle->PID))
             {
@@ -256,6 +271,7 @@ void AnalysisCPP(const char *inputFile)
               elec_pt_float.push_back(particle->PT);
               elec_Eta_float.push_back(particle->Eta);
               elec_Phi_float.push_back(particle->Phi);
+              elec_E_float.push_back(particle->E);
             }
             if (200002 == abs(particle->PID))
             {
@@ -276,20 +292,13 @@ void AnalysisCPP(const char *inputFile)
               NN3_Phi_float.push_back(particle->Phi);
             }
           }
-          //}
-          ////////
         }
-        if(branchJet->GetEntries() > 0)
-        {
-          //cout << "Number of Jets: "<< branchJet->GetEntries() << endl;
-          for( unsigned int b = 0; b < branchJet->GetEntries(); b = b + 1 )
-          {
-          // Take first jet
+        if(branchJet->GetEntries() > 0)  {
+          for( unsigned int b = 0; b < branchJet->GetEntries(); b = b + 1 ){
             Jet *jet = (Jet*) branchJet->At(b);
-              // Plot jet transverse momentum
-              Jet_pt_float.push_back(jet->PT);
-              Jet_Eta_float.push_back(jet->Eta);
-              Jet_Phi_float.push_back(jet->Phi);
+            Jet_pt_float.push_back(jet->PT);
+            Jet_Eta_float.push_back(jet->Eta);
+            Jet_Phi_float.push_back(jet->Phi);
           }
         }
         // Calculate the number of particles per event
@@ -304,23 +313,38 @@ void AnalysisCPP(const char *inputFile)
         }
 
         // Delta R Analysis
-        if ( Muon_pt_float.size() == 2 and chi_pt_float.size() == 2 )
-        {
-          //cout << "Creating TLorentzVector"<< endl;
-          TLorentzVector c1;
-          TLorentzVector c2;
-          TLorentzVector m1;
-          TLorentzVector m2;
+        // Chis
+        if ( Muon_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
+          chi_Muon_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,Muon_pt_float,Muon_Eta_float,Muon_Phi_float,Muon_E_float));
+        }
+        if ( elec_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
+          chi_elec_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,elec_pt_float,elec_Eta_float,elec_Phi_float,elec_E_float));
+        }
+        if ( tau_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
+          chi_tau_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,tau_pt_float,tau_Eta_float,tau_Phi_float,tau_E_float));
+        }
 
-          c1.SetPtEtaPhiE(chi_pt_float[0],chi_Eta_float[0],chi_Phi_float[0],chi_E_float[0]);
-          c2.SetPtEtaPhiE(chi_pt_float[1],chi_Eta_float[1],chi_Phi_float[1],chi_E_float[1]);
-          m1.SetPtEtaPhiE(Muon_pt_float[0],Muon_Eta_float[0],Muon_Phi_float[0],Muon_E_float[0]);
-          m2.SetPtEtaPhiE(Muon_pt_float[1],Muon_Eta_float[1],Muon_Phi_float[1],Muon_E_float[1]);
-
-          Muon_DeltaR.push_back(Delta_R_Function(c1,c2,m1,m2));
+        // Scalar
+        if ( Muon_pt_float.size() == 2 and scalar_pt_float.size() == 2 ){
+            scalar_Muon_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,Muon_pt_float,Muon_Eta_float,Muon_Phi_float,Muon_E_float));
+          }
+        if ( elec_pt_float.size() == 2 and scalar_pt_float.size() == 2 )  {
+            scalar_elec_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,elec_pt_float,elec_Eta_float,elec_Phi_float,elec_E_float));
+          }
+        if ( tau_pt_float.size() == 2 and scalar_pt_float.size() == 2 ){
+          scalar_tau_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,tau_pt_float,tau_Eta_float,tau_Phi_float,tau_E_float));
           }
 
-
+        // Psi
+        if ( Muon_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
+          Psi_Muon_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,Muon_pt_float,Muon_Eta_float,Muon_Phi_float,Muon_E_float));
+        }
+        if ( elec_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
+          Psi_elec_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,elec_pt_float,elec_Eta_float,elec_Phi_float,elec_E_float));
+        }
+        if ( tau_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
+          Psi_tau_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,tau_pt_float,tau_Eta_float,tau_Phi_float,tau_E_float));
+        }
 
         T->Fill();
         T_Delta->Fill();
@@ -353,6 +377,7 @@ void AnalysisCPP(const char *inputFile)
         elec_pt_float.clear();
         elec_Eta_float.clear();
         elec_Phi_float.clear();
+        elec_E_float.clear();
 
 
         Muon_status_int.clear();
@@ -367,6 +392,7 @@ void AnalysisCPP(const char *inputFile)
         tau_pt_float.clear();
         tau_Eta_float.clear();
         tau_Phi_float.clear();
+        tau_E_float.clear();
 
         NN1_pt_float.clear();
         NN1_Eta_float.clear();
@@ -380,8 +406,17 @@ void AnalysisCPP(const char *inputFile)
         NN3_Eta_float.clear();
         NN3_Phi_float.clear();
 
+        chi_Muon_DeltaR.clear();
+        chi_elec_DeltaR.clear();
+        chi_tau_DeltaR.clear();
 
-        Muon_DeltaR.clear();
+        scalar_Muon_DeltaR.clear();
+        scalar_elec_DeltaR.clear();
+        scalar_tau_DeltaR.clear();
+
+        Psi_Muon_DeltaR.clear();
+        Psi_elec_DeltaR.clear();
+        Psi_tau_DeltaR.clear();
   }
   T->Print();
   T_Delta->Print();
