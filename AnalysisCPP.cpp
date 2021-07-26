@@ -15,33 +15,85 @@ R__LOAD_LIBRARY(libDelphes)
 #endif
 
 //------------------------------------------------------------------------------
-double Delta_R_Function(vector<float> p1_pt ,vector<float> p1_Eta ,vector<float> p1_Phi ,vector<float> p1_E, vector<float> p2_pt ,vector<float> p2_Eta ,vector<float> p2_Phi ,vector<float> p2_E  )
-{
-  // Function that calcluates the minimum delta R value between the pairs of particles (p1 and p2)
-  TLorentzVector c1;
-  TLorentzVector c2;
-  TLorentzVector m1;
-  TLorentzVector m2;
-  c1.SetPtEtaPhiE(p1_pt[0],p1_Eta[0],p1_Phi[0],p1_E[0]);
-  c2.SetPtEtaPhiE(p1_pt[1],p1_Eta[1],p1_Phi[1],p1_E[1]);
-  m1.SetPtEtaPhiE(p2_pt[0],p2_Eta[0],p2_Phi[0],p2_E[0]);
-  m2.SetPtEtaPhiE(p2_pt[1],p2_Eta[1],p2_Phi[1],p2_E[1]);
-  float DR_pr1 = c1.DeltaR(m1);
-  float DR_pr2 = c1.DeltaR(m2);
-  float DR_pr3 = c2.DeltaR(m1);
-  float DR_pr4 = c2.DeltaR(m2);
-  if (DR_pr1 + DR_pr4 <  DR_pr2 + DR_pr3)
-  {
-    if (DR_pr1 < DR_pr4){return DR_pr1;}
-    else  {return DR_pr4;}
-  }
-  else
-  {
-    if (DR_pr2 < DR_pr3){return DR_pr2;}
-    else   {  return DR_pr3;  }
-  }
+float PairsDeltaR(vector<GenParticle*> pt1 , vector<GenParticle*> pt2){
+  // Calculates the delta R values between pairs of particles
+      TLorentzVector c1;
+      TLorentzVector c2;
+      TLorentzVector m1;
+      TLorentzVector m2;
+      //cout << pt1[0]->Mass << endl;
+      c1.SetPtEtaPhiE(pt1[0]->PT,pt1[0]->Eta,pt1[0]->Phi,pt1[0]->Mass);
+      c2.SetPtEtaPhiE(pt1[1]->PT,pt1[1]->Eta,pt1[1]->Phi,pt1[1]->Mass);
+      m1.SetPtEtaPhiE(pt2[0]->PT,pt2[0]->Eta,pt2[0]->Phi,pt2[0]->Mass);
+      m2.SetPtEtaPhiE(pt2[1]->PT,pt2[1]->Eta,pt2[1]->Phi,pt2[1]->Mass);
+      float DR_pr1 = c1.DeltaR(m1);
+      float DR_pr2 = c1.DeltaR(m2);
+      float DR_pr3 = c2.DeltaR(m1);
+      float DR_pr4 = c2.DeltaR(m2);
+      if (DR_pr1 + DR_pr4 <  DR_pr2 + DR_pr3)
+      {
+        if (DR_pr1 < DR_pr4){return DR_pr1;}
+        else  {return DR_pr4;}
+      }
+      else
+      {
+        if (DR_pr2 < DR_pr3){return DR_pr2;}
+        else   {  return DR_pr3;  }
+      }
 }
 
+float PairsMuonDeltaR(vector<Muon*> pt1 , vector<GenParticle*> pt2){
+  // Calculates the delta R values between pairs of particles
+      TLorentzVector c1;
+      TLorentzVector c2;
+      TLorentzVector m1;
+      TLorentzVector m2;
+
+      c1.SetPtEtaPhiE(pt1[0]->PT,pt1[0]->Eta,pt1[0]->Phi,0.10566);
+      c2.SetPtEtaPhiE(pt1[1]->PT,pt1[1]->Eta,pt1[1]->Phi,0.10566);
+      m1.SetPtEtaPhiE(pt2[0]->PT,pt2[0]->Eta,pt2[0]->Phi,pt2[0]->Mass);
+      m2.SetPtEtaPhiE(pt2[1]->PT,pt2[1]->Eta,pt2[1]->Phi,pt2[1]->Mass);
+      float DR_pr1 = c1.DeltaR(m1);
+      float DR_pr2 = c1.DeltaR(m2);
+      float DR_pr3 = c2.DeltaR(m1);
+      float DR_pr4 = c2.DeltaR(m2);
+      if (DR_pr1 + DR_pr4 <  DR_pr2 + DR_pr3)
+      {
+        if (DR_pr1 < DR_pr4){return DR_pr1;}
+        else  {return DR_pr4;}
+      }
+      else
+      {
+        if (DR_pr2 < DR_pr3){return DR_pr2;}
+        else   {  return DR_pr3;  }
+      }
+}
+
+float PairsElectronDeltaR(vector<Electron*> pt1 , vector<GenParticle*> pt2){
+  // Calculates the delta R values between pairs of particles
+      TLorentzVector c1;
+      TLorentzVector c2;
+      TLorentzVector m1;
+      TLorentzVector m2;
+      c1.SetPtEtaPhiE(pt1[0]->PT,pt1[0]->Eta,pt1[0]->Phi,0.000511);
+      c2.SetPtEtaPhiE(pt1[1]->PT,pt1[1]->Eta,pt1[1]->Phi,0.000511);
+      m1.SetPtEtaPhiE(pt2[0]->PT,pt2[0]->Eta,pt2[0]->Phi,pt2[0]->Mass);
+      m2.SetPtEtaPhiE(pt2[1]->PT,pt2[1]->Eta,pt2[1]->Phi,pt2[1]->Mass);
+      float DR_pr1 = c1.DeltaR(m1);
+      float DR_pr2 = c1.DeltaR(m2);
+      float DR_pr3 = c2.DeltaR(m1);
+      float DR_pr4 = c2.DeltaR(m2);
+      if (DR_pr1 + DR_pr4 <  DR_pr2 + DR_pr3)
+      {
+        if (DR_pr1 < DR_pr4){return DR_pr1;}
+        else  {return DR_pr4;}
+      }
+      else
+      {
+        if (DR_pr2 < DR_pr3){return DR_pr2;}
+        else   {  return DR_pr3;  }
+      }
+}
 vector<float> TrackDeltaR(vector<GenParticle*> pt1 , vector<Track*> trks){
   // Function that calculates the Delta R value between the charged particles (chi/scalar) and the detector tracks
   vector<float> TrackDeltaR_Values;
@@ -55,7 +107,10 @@ vector<float> TrackDeltaR(vector<GenParticle*> pt1 , vector<Track*> trks){
         TLorentzVector track;
         particle1.SetPtEtaPhiM(pt1[a]->PT,pt1[a]->Eta,pt1[a]->Phi,pt1[a]->Mass);
         track.SetPtEtaPhiM(trks[b]->PT,trks[b]->Eta,trks[b]->Phi,trks[b]->Mass);
-        TrackDeltaR_Values.push_back(particle1.DeltaR(track));
+        if (particle1.DeltaR(track) < 1){
+          TrackDeltaR_Values.push_back(particle1.DeltaR(track));
+          //cout << trks[b]->PID << endl;
+        }
       }
     }
   }
@@ -97,12 +152,14 @@ void AnalysisCPP(const char *inputFile)
   vector<float> scalar_Eta_float;
   vector<float> scalar_Phi_float;
 
+  vector<GenParticle*> psis;
   vector<int> psi_status_int;
   vector<float> psi_pt_float;
   vector<float> psi_E_float;
   vector<float> psi_Eta_float;
   vector<float> psi_Phi_float;
 
+  vector<GenParticle*> elecs_gen;
   vector<int> elec_Gen_N_int;
   vector<int> elec_Gen_status_int;
   vector<float> elec_Gen_E_float;
@@ -110,6 +167,7 @@ void AnalysisCPP(const char *inputFile)
   vector<float> elec_Gen_Eta_float;
   vector<float> elec_Gen_Phi_float;
 
+  vector<GenParticle*> muons_gen;
   vector<int> Muon_Gen_status_int;
   vector<int> Muon_Gen_N_int;
   vector<float> Muon_Gen_pt_float;
@@ -117,6 +175,7 @@ void AnalysisCPP(const char *inputFile)
   vector<float> Muon_Gen_Phi_float;
   vector<float> Muon_Gen_E_float;
 
+  vector<GenParticle*> taus_gen;
   vector<int> tau_Gen_status_int;
   vector<int> tau_Gen_N_int;
   vector<float> tau_Gen_E_float;
@@ -137,10 +196,14 @@ void AnalysisCPP(const char *inputFile)
   vector<float> NN3_Phi_float;
 
   // Detector Variables
+  vector<Electron*> elecs;
+  vector<int> elec_N_int;
   vector<float> elec_pt_float;
   vector<float> elec_Eta_float;
   vector<float> elec_Phi_float;
 
+  vector<Muon*> muons;
+  vector<int> muon_N_int;
   vector<float> Muon_pt_float;
   vector<float> Muon_Eta_float;
   vector<float> Muon_Phi_float;
@@ -152,8 +215,6 @@ void AnalysisCPP(const char *inputFile)
   vector<float> Track_pt_float;
   vector<float> Track_Eta_float;
   vector<float> Track_Phi_float;
-
-
 
   // Delta R Analysis Variable
   vector<float> chi_Muon_DeltaR;
@@ -167,6 +228,9 @@ void AnalysisCPP(const char *inputFile)
   vector<float> Psi_Muon_DeltaR;
   vector<float> Psi_elec_DeltaR;
   vector<float> Psi_tau_DeltaR;
+
+  vector<float> Muon_Muon_Gen_Delta_R;
+  vector<float> elec_elec_Gen_Delta_R;
 
   vector<Track*> tracks;
 
@@ -233,10 +297,12 @@ void AnalysisCPP(const char *inputFile)
 
   // Detector Branches
   T_Det->Branch("elec_pt",&elec_pt_float);
+  T_Det->Branch("elec_N",&elec_N_int);
   T_Det->Branch("elec_Eta",&elec_Eta_float);
   T_Det->Branch("elec_Phi",&elec_Phi_float);
 
   T_Det->Branch("Muon_pt",&Muon_pt_float);
+  T_Det->Branch("Muon_N",&muon_N_int);
   T_Det->Branch("Muon_Eta",&Muon_Eta_float);
   T_Det->Branch("Muon_Phi",&Muon_Phi_float);
 
@@ -263,6 +329,9 @@ void AnalysisCPP(const char *inputFile)
   T_Delta->Branch("Psi_Muon_Delta_R", &Psi_Muon_DeltaR);
   T_Delta->Branch("Psi_elec_Delta_R", &Psi_elec_DeltaR);
   T_Delta->Branch("Psi_tau_Delta_R", &Psi_tau_DeltaR);
+
+  T_Delta->Branch("Muon_Muon_Gen_Delta_R", &Muon_Muon_Gen_Delta_R);
+  T_Delta->Branch("elec_elec_Gen_Delta_R", &elec_elec_Gen_Delta_R);
 
   T_Delta->Branch("Chi_Track_Delta_R", &chi_Track_DeltaR);
   T_Delta->Branch("Scalar_Track_Delta_R", &scalar_Track_DeltaR);
@@ -296,7 +365,7 @@ void AnalysisCPP(const char *inputFile)
             if (5000001 == abs(particle->PID))
             {
               scalar_status_int.push_back(particle->Status);
-              if (1 == (particle->Status))
+              if (2 == (particle->Status)) // For Three Body Process Change to 2, for Two body 1
               {
               scalars.push_back(particle);
               scalar_pt_float.push_back(particle->PT);
@@ -311,6 +380,7 @@ void AnalysisCPP(const char *inputFile)
               psi_status_int.push_back(particle->Status);
               if (1 == (particle->Status))
               {
+              psis.push_back(particle);
               psi_pt_float.push_back(particle->PT);
               psi_E_float.push_back(particle->E);
               psi_Eta_float.push_back(particle->Eta);
@@ -320,6 +390,8 @@ void AnalysisCPP(const char *inputFile)
             // Muon
             if (13 == abs(particle->PID))
             {
+
+              muons_gen.push_back(particle);
               Muon_Gen_status_int.push_back(particle->Status);
               Muon_Gen_pt_float.push_back(particle->PT);
               Muon_Gen_Eta_float.push_back(particle->Eta);
@@ -329,6 +401,7 @@ void AnalysisCPP(const char *inputFile)
             // Tau
             if (15 == abs(particle->PID))
             {
+              taus_gen.push_back(particle);
               tau_Gen_status_int.push_back(particle->Status);
               tau_Gen_pt_float.push_back(particle->PT);
               tau_Gen_Eta_float.push_back(particle->Eta);
@@ -338,6 +411,7 @@ void AnalysisCPP(const char *inputFile)
             // Electron
             if (11 == abs(particle->PID))
             {
+              elecs_gen.push_back(particle);
               elec_Gen_status_int.push_back(particle->Status);
               elec_Gen_pt_float.push_back(particle->PT);
               elec_Gen_Eta_float.push_back(particle->Eta);
@@ -382,6 +456,7 @@ void AnalysisCPP(const char *inputFile)
           for( unsigned int q = 0; q < branchMuon->GetEntries(); q = q + 1 ){
             //cout << "Muon" << endl;
             Muon *muon = (Muon*) branchMuon->At(q);
+            muons.push_back(muon);
             Muon_pt_float.push_back(muon->PT);
             Muon_Eta_float.push_back(muon->Eta);
             Muon_Phi_float.push_back(muon->Phi);
@@ -390,6 +465,7 @@ void AnalysisCPP(const char *inputFile)
         if(branchElectron->GetEntries() > 0)  {
           for( unsigned int b = 0; b < branchElectron->GetEntries(); b = b + 1 ){
             Electron *elec = (Electron*) branchElectron->At(b);
+            elecs.push_back(elec);
             elec_pt_float.push_back(elec->PT);
             elec_Eta_float.push_back(elec->Eta);
             elec_Phi_float.push_back(elec->Phi);
@@ -406,48 +482,53 @@ void AnalysisCPP(const char *inputFile)
         }
 
         // Calculate the number of particles per event
-        if (Muon_Gen_pt_float.size() > 0){
-          Muon_Gen_N_int.push_back(Muon_Gen_pt_float.size());
-        }
-        if (elec_Gen_pt_float.size() > 0){
-          elec_Gen_N_int.push_back(elec_Gen_pt_float.size());
-        }
-        if (tau_Gen_pt_float.size() > 0){
-          tau_Gen_N_int.push_back(tau_Gen_pt_float.size());
-        }
+
+        Muon_Gen_N_int.push_back(Muon_Gen_pt_float.size());
+        elec_Gen_N_int.push_back(elec_Gen_pt_float.size());
+        tau_Gen_N_int.push_back(tau_Gen_pt_float.size());
+        muon_N_int.push_back(Muon_pt_float.size());
+        elec_N_int.push_back(elec_pt_float.size());
 
         // Delta R Analysis
         // Chis
-        if ( Muon_Gen_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
-          chi_Muon_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,Muon_Gen_pt_float,Muon_Gen_Eta_float,Muon_Gen_Phi_float,Muon_Gen_E_float));
+        if (chis.size() == 2 and muons_gen.size() == 2 ){
+          chi_Muon_DeltaR.push_back(PairsDeltaR(chis,muons_gen));
         }
-        if ( elec_Gen_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
-          chi_elec_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,elec_Gen_pt_float,elec_Gen_Eta_float,elec_Gen_Phi_float,elec_Gen_E_float));
+        if (chis.size() == 2 and elecs_gen.size() == 2 ){
+          chi_elec_DeltaR.push_back(PairsDeltaR(chis,elecs_gen));
         }
-        if ( tau_Gen_pt_float.size() == 2 and chi_pt_float.size() == 2 )  {
-          chi_tau_DeltaR.push_back(Delta_R_Function(chi_pt_float,chi_Eta_float,chi_Phi_float,chi_E_float,tau_Gen_pt_float,tau_Gen_Eta_float,tau_Gen_Phi_float,tau_Gen_E_float));
+        if (chis.size() == 2 and taus_gen.size() == 2 ){
+          chi_tau_DeltaR.push_back(PairsDeltaR(chis,taus_gen));
+        }
+        // Scalars
+        if (scalars.size() == 2 and muons_gen.size() == 2 ){
+          scalar_Muon_DeltaR.push_back(PairsDeltaR(scalars,muons_gen));
+        }
+        if (scalars.size() == 2 and elecs_gen.size() == 2 ){
+          scalar_elec_DeltaR.push_back(PairsDeltaR(scalars,elecs_gen));
+        }
+        if (scalars.size() == 2 and taus_gen.size() == 2 ){
+          scalar_tau_DeltaR.push_back(PairsDeltaR(scalars,taus_gen));
+        }
+        // Psis
+        if (psis.size() == 2 and muons_gen.size() == 2 ){
+          Psi_Muon_DeltaR.push_back(PairsDeltaR(psis,muons_gen));
+        }
+        if (psis.size() == 2 and elecs_gen.size() == 2 ){
+          Psi_elec_DeltaR.push_back(PairsDeltaR(psis,elecs_gen));
+        }
+        if (psis.size() == 2 and taus_gen.size() == 2 ){
+          Psi_tau_DeltaR.push_back(PairsDeltaR(psis,taus_gen));
         }
 
-        // Scalar
-        if ( Muon_Gen_pt_float.size() == 2 and scalar_pt_float.size() == 2 ){
-            scalar_Muon_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,Muon_Gen_pt_float,Muon_Gen_Eta_float,Muon_Gen_Phi_float,Muon_Gen_E_float));
-          }
-        if ( elec_Gen_pt_float.size() == 2 and scalar_pt_float.size() == 2 )  {
-            scalar_elec_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,elec_Gen_pt_float,elec_Gen_Eta_float,elec_Gen_Phi_float,elec_Gen_E_float));
-          }
-        if ( tau_Gen_pt_float.size() == 2 and scalar_pt_float.size() == 2 ){
-          scalar_tau_DeltaR.push_back(Delta_R_Function(scalar_pt_float,scalar_Eta_float,scalar_Phi_float,scalar_E_float,tau_Gen_pt_float,tau_Gen_Eta_float,tau_Gen_Phi_float,tau_Gen_E_float));
-          }
 
-        // Psi
-        if ( Muon_Gen_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
-          Psi_Muon_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,Muon_Gen_pt_float,Muon_Gen_Eta_float,Muon_Gen_Phi_float,Muon_Gen_E_float));
+        // Lepton Pair Matching
+
+        if (muons.size() == 2 and muons_gen.size() == 2 ){
+          Muon_Muon_Gen_Delta_R.push_back(PairsMuonDeltaR(muons,muons_gen));
         }
-        if ( elec_Gen_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
-          Psi_elec_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,elec_Gen_pt_float,elec_Gen_Eta_float,elec_Gen_Phi_float,elec_Gen_E_float));
-        }
-        if ( tau_Gen_pt_float.size() == 2 and psi_pt_float.size() == 2 ){
-          Psi_tau_DeltaR.push_back(Delta_R_Function(psi_pt_float,psi_Eta_float,psi_Phi_float,psi_E_float,tau_Gen_pt_float,tau_Gen_Eta_float,tau_Gen_Phi_float,tau_Gen_E_float));
+        if (elecs.size() == 2 and elecs_gen.size() == 2 ){
+          elec_elec_Gen_Delta_R.push_back(PairsElectronDeltaR(elecs,elecs_gen));
         }
 
         // Calculates the deltaR value between chis, scalars and the tracks
@@ -476,12 +557,14 @@ void AnalysisCPP(const char *inputFile)
         scalar_Eta_float.clear();
         scalar_Phi_float.clear();
 
+        psis.clear();
         psi_status_int.clear();
         psi_pt_float.clear();
         psi_E_float.clear();
         psi_Eta_float.clear();
         psi_Phi_float.clear();
 
+        elecs_gen.clear();
         elec_Gen_status_int.clear();
         elec_Gen_N_int.clear();
         elec_Gen_pt_float.clear();
@@ -489,6 +572,7 @@ void AnalysisCPP(const char *inputFile)
         elec_Gen_Phi_float.clear();
         elec_Gen_E_float.clear();
 
+        muons_gen.clear();
         Muon_Gen_status_int.clear();
         Muon_Gen_N_int.clear();
         Muon_Gen_pt_float.clear();
@@ -496,6 +580,7 @@ void AnalysisCPP(const char *inputFile)
         Muon_Gen_Phi_float.clear();
         Muon_Gen_E_float.clear();
 
+        taus_gen.clear();
         tau_Gen_status_int.clear();
         tau_Gen_N_int.clear();
         tau_Gen_pt_float.clear();
@@ -516,10 +601,14 @@ void AnalysisCPP(const char *inputFile)
         NN3_Phi_float.clear();
 
         //Detector Clears
+        muons.clear();
+        muon_N_int.clear();
         Muon_pt_float.clear();
         Muon_Eta_float.clear();
         Muon_Phi_float.clear();
 
+        elecs.clear();
+        elec_N_int.clear();
         elec_pt_float.clear();
         elec_Eta_float.clear();
         elec_Phi_float.clear();
@@ -544,6 +633,10 @@ void AnalysisCPP(const char *inputFile)
         Psi_Muon_DeltaR.clear();
         Psi_elec_DeltaR.clear();
         Psi_tau_DeltaR.clear();
+
+        Muon_Muon_Gen_Delta_R.clear();
+        elec_elec_Gen_Delta_R.clear();
+
 
 
         tracks.clear();
